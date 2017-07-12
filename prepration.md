@@ -82,4 +82,37 @@ brew uninstall opencv
 
    如果这时候，你还是像我一样倒霉，遇到了这个问题：`Error: No such file or directory - /private/tmp/opencv3-20170712-32425-22jrb3/3rdparty/ippicv/downloader.cmake`。这是由于*3rdparty/ippicv/downloader.cmake*已经从远程仓库中被移除了，homebrew没有及时更新到。莫要惊慌，把`--head`去掉再来一次。
 
-   PS： 如果你之前安装过macports，这边还会有问题。要`sudo mv /opt/local ~/macports`，不然环境变量之类的设置会有些问题。
+7. 在上述步骤安装完成以后，先等等，别急着运行，否则是找不到模块的。。安装完成的log中有这样一段话：
+
+   ```
+   This formula is keg-only, which means it was not symlinked into /usr/local,
+   because opencv3 and opencv install many of the same files.
+
+   If you need to have this software first in your PATH run:
+     echo 'export PATH="/usr/local/opt/opencv3/bin:$PATH"' >> ~/.bash_profile
+
+   For compilers to find this software you may need to set:
+       LDFLAGS:  -L/usr/local/opt/opencv3/lib
+       CPPFLAGS: -I/usr/local/opt/opencv3/include
+   For pkg-config to find this software you may need to set:
+       PKG_CONFIG_PATH: /usr/local/opt/opencv3/lib/pkgconfig
+
+
+   If you need Python to find bindings for this keg-only formula, run:
+     echo /usr/local/opt/opencv3/lib/python2.7/site-packages >> /usr/local/lib/python2.7/site-packages/opencv3.pth
+   ```
+
+   所以还需要在命令行中执行`echo /usr/local/opt/opencv3/lib/python2.7/site-packages >> /usr/local/lib/python2.7/site-packages/opencv3.pth`。Done & Done with python 2.7！这时候在命令行运行`python`， `import cv2`可以看到已经能正常import了。
+
+8. 然鹅，如果你用pthon3，发现还是不能正常引用这个包的。接下来就来填python3.5+的坑吧。记得在第6步的时候我们在安装opencv的时候添加了`--with-python3`，这个确实有用，我们的python3.5+版本下已经有了*cv2.so*。但是！如果你用`ls -l /usr/local/opt/opencv3/lib/python3.5/site-packages/`会发现它不叫*cv2.so*，而是有一串后缀的。。所以解决方法也很简单。
+
+   ```
+   cd /usr/local/opt/opencv3/lib/python3.6/site-packages/
+   mv cv2.cpython-36m-darwin.so cv2.so
+   ```
+
+   然后继续上面的命令`$ echo /usr/local/opt/opencv3/lib/python3.6/site-packages >> /usr/local/lib/python3.6/site-packages/opencv3.pth`就完工了。
+
+   ​
+
+   PS： 如果你之前安装过macports，用homebrew安装opencv的时候还会有问题。要`sudo mv /opt/local ~/macports`，不然环境变量之类的设置会有些问题。
